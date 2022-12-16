@@ -1,0 +1,214 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+% Welcome to Overleaf --- just edit your LaTeX on the left,
+% and we'll compile it for you on the right. If you open the
+% 'Share' menu, you can invite other users to edit at the same
+% time. See www.overleaf.com/learn for more info. Enjoy!
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\documentclass{beamer}
+\usepackage{tikz}
+\usetheme{Madrid}
+\usepackage{ctex}
+\usecolortheme{default}
+\usepackage{verbatim}
+\title[2022.11.14日汇报] %optional
+{2022.11.14汇报}
+%\subtitle{Demonstrating the Berkeley theme}
+\author[周添文] % (optional)
+{周添文\inst{} }
+
+\institute[] % (optional)
+{
+  \inst{}%
+  数学科学学院\\
+  北京师范大学\\
+ % \and
+  %\inst{2}%
+%  Faculty of Chemistry\\
+%  Very Famous University
+}
+
+\date[2022.11.14] % (optional)
+%{Very Large Conference, April 2021}
+
+% Use a simple TikZ graphic to show where the logo is positioned
+
+%\node[draw,color=white] at (0,0) {LOGO HERE};
+
+
+%End of title page configuration block
+%------------------------------------------------------------
+%The next block of commands puts the table of contents at the 
+%beginning of each section and highlights the current section:
+
+\AtBeginSection[]
+{
+  \begin{frame}
+    \frametitle{Table of Contents}
+    \tableofcontents[currentsection]
+  \end{frame}
+}
+%------------------------------------------------------------
+\begin{document}
+\frame{\titlepage}
+%\logo{\includegraphics[]{bnu.png}}
+%---------------------------------------------------------
+%Highlighting text
+\begin{frame}
+\frametitle{基于Lossy Source Coding和Sparse Transform Matrix的杂散光抑制方法}
+
+\begin{itemize}
+\item 杂散光的Point Spread Function(PSF)
+\item 有损编码(Lossy Source Coding)
+\item 稀疏矩阵变换(STM)
+\end{itemize}
+%\begin{comment}
+%\begin{block}{Remark}
+%Sample text
+%\end{block}
+
+%\begin{alertblock}{Important theorem}
+%Sample text in red box
+%\end{alertblock}
+
+%\begin{examples}
+%Sample text in green box. The title of the block %is ``Examples".\pause
+
+%HI
+
+%\end{examples}
+\end{frame}
+\begin{frame}
+\frametitle{杂散光的Point Spread Function}
+%\begin{itemize}
+%\item 
+迭代法描述图像还原过程
+\begin{equation}
+\hat{x}_{t+1}=\hat{x_t}+y-A\hat{x_t}
+\end{equation}\pause
+其中，$y$是观察到的图像，$\hat{x}_{t}$是第t次迭代后的估计图像，而
+\begin{equation}
+A=((1-\beta)G_{DA}+\beta S_{STR})
+\end{equation}
+描述的是杂散光对图像的影响作用\pause
+
+$S_{STR}$是占比为$0<\beta<1$的纯杂散光部分，$G_{DA}$是\textbf{衍射}(Diffraction)和\textbf{像差}(Aberration)部分。
+
+%\end{itemize}
+\end{frame}
+\begin{frame}
+\frametitle{杂散光的Point Spread Function}
+在这当中，我们可以写出上述衍射和像差部分在像素$(i_p,j_p)$处的值是
+\begin{equation}
+G_{DA}(i_q,j_q,i_p,j_p;\sigma)=\frac{K}{\sigma ^2}\exp(-\frac{(i_q-i_p)^2+(j_q-j_p)^2}{2\sigma ^2})
+\end{equation}
+其中，K是正规化参数\pause
+
+由此可得，纯杂散光部分的表达式是
+\begin{align*}
+S_{STR}(i_q,j_q,i_p,j_p;a,b,c,\alpha)&=
+\frac{1}{z}(1+\frac{1}{i_p^2+j_p^2}(\frac{(i_qi_p+j_qj_p-i_p^2-j_p^2)^2}{(c+a(i_p^2+j_p^2))^2}\\&+\frac{(-i_qi_p+j_qj_p)^2}{(c+b(i_p^2+j_p^2))^2})
+\end{align*}
+
+\end{frame}
+\begin{frame}
+\frametitle{杂散光的Point Spread Function}
+其中$a,b,c,z,\alpha$均为正规化参数，其存在如下关系：
+\begin{equation}
+z=\frac{\pi}{\alpha-1}(c+a(i_p^2+j_p^2)(c+b(i_q^2+j_q^2))
+\end{equation}
+使得上式满足
+\begin{equation}
+\int_{i_q}\int_{j_q}S_{i_q,j_p}di_qdj_q=1
+\end{equation}\pause
+由文献[2]中的\textbf{余弦四次方定律}(cosine fourth law)，我们知道模型整体需要乘上$cos^2\gamma=\frac{D^2}{i_p^2+j_p^2+D^2}$，D为出瞳位置到图像平面的距离，$\gamma$表示图像系统的光轴和光所成的角度\\
+\end{frame}
+\begin{frame}
+\frametitle{杂散光的Point Spread Function}
+综上，杂散光的PSF模型总体可描述为：
+\begin{equation}
+S=\frac{D^2}{i_p^2+j_p^2+D^2}((1-\beta)G_{DA}+\beta S_{STR})
+\end{equation}\pause
+
+因此，我们得到了图像还原的简化过程：
+\begin{equation}
+\hat{x}=2y-(1-\beta)y-\beta Sy
+\end{equation}\pause
+
+在这当中，$Sy$是与空间位置（像素位置）有关系的量，因此在面对真实图片时，其计算量很大， 故而我们需要引入\textbf{有损编码}(Lossy  Source Coding)进行计算的简化。
+\end{frame}
+\begin{frame}
+\frametitle{有损编码(Lossy Source Coding)}
+这一技术的目的是将图片的信息集中，以此简化计算
+
+这一部分运算比较复杂，\alert{细节没有完全理解}，其整体分为如下几步：\pause
+
+\begin{itemize}
+\item 测量白化(Measurement Whitening)
+\item 将矩阵$S$的列向量去相关化
+\item 小波变换(wavelet transform)
+\item 离散化
+\end{itemize}
+\end{frame}
+\begin{frame}
+\frametitle{稀疏矩阵变换(Sparse Matrix Transform)}
+稀疏矩阵变换是将一个矩阵T分解成一系列稀疏矩阵（含有大量0元素）的乘积的过程，即
+\begin{equation}
+T=\prod_{k=K-1}^{0}T_k=T_{k-1}T_{k-2}\cdots T_0
+\end{equation}\pause
+而每一个稀疏矩阵$T_k$都可以分解为$T_k=B_k\Lambda _k A_k$，其中$A_k,B_k$为旋转矩阵，$\Lambda _k$是单位矩阵
+\end{frame}
+\begin{frame}
+\frametitle{算法展示}
+\subsection{算法}
+\textbf{输入}：观察到的图像$y$
+
+\textbf{输出}：修正后的图像$\hat{x}$
+
+\textbf{初始化}：设置参数$a,b,c,\alpha,\beta,D$的值\pause
+
+\begin{itemize}
+\item 对原始图像应用PSF模型
+\begin{equation}
+S=\frac{D^2}{i_p^2+j_p^2+D^2}((1-\beta)G_{DA}+\beta S_{STR})
+\end{equation}\pause
+\item 应用Lossy source coding，将矩阵S转化为易分解为稀疏矩阵的形式\pause
+\item 应用稀疏矩阵变换\pause
+\item 得到$X=Sy$的表达式，带入原方程
+\begin{equation}
+\hat{x}=2y-(1-\beta)y-\beta X
+\end{equation}
+\end{itemize}
+\end{frame}
+\begin{frame}
+\frametitle{基于稀疏约束和多尺度的杂散光抑制方法}
+该方法主要采用求解偏微分方程的方法，细节较为复杂，还没有阅读完成，其总体思路如下：
+
+将观察到的退化图像$Z$分解为目标图像$I$和杂散光图像$B$，其关系为
+\begin{equation}
+Z_i=I_i+B_i+n, 1\leq i\leq n_p
+\end{equation}\pause
+其中，$n_p$是图像中像素个数，$i$为像素的序号，$n$是噪声的影响。而整个杂散光抑制的过程则是\textbf{在给定的退化图像$Z$的基础上，估计式子中杂散光图像$B$，进而估计$I$。}
+\end{frame}
+\begin{frame}
+\frametitle{基于稀疏约束和多尺度的杂散光抑制方法}
+我们对杂散光图像$B$和目标图像$I$添加正则约束$C_I(I), C_B(B)$，则杂散光抑制问题转化了如下的能量函数最小值问题：
+\begin{equation}
+F(\hat{I},\hat{B})=\arg\min \frac{1}{2}||Z-I-B||_2^2+\alpha C_B(B)+\beta C_I(I)
+\end{equation}
+其中$\alpha >0, \beta>0$是平衡约束项的参数\pause
+
+最后，我们只需要用\textbf{Euler-Lagrange法}求解上述泛函的极值即可。
+\end{frame}
+\begin{frame}
+\frametitle{参考文献}
+\begin{thebibliography}{99}
+\bibitem{article1}P.A. Jansson, Deconvolution of Images and Spectra, Springer, New York, 1996.
+\bibitem{article2}W.J. Smith, Modern Optical Engineering: The Design of Optical Systems,
+McGraw Hill, New York, 2000.
+\bibitem{article3}李思圆. 基于稀疏约束的杂散光抑制算法[D].华中科技大学,2016.
+\bibitem{article4}Fan Y H, Qin S Y. A fast algorithm for stray light correction based on lossy source coding and SMT[J]. Optik, 2013, 124(14): 1677-1682.
+\end{thebibliography}
+\end{frame}
+\end{document}
